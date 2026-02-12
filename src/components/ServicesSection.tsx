@@ -39,7 +39,7 @@ const iconMap = [Layout, ShoppingCart, Globe, Database, Lock, ShieldCheck, Plug,
 
 const ServicesSection = () => {
   return (
-    <section id="services" className="py-24 bg-background">
+    <section id="services" className="py-24 bg-muted">
       <div className="container mx-auto px-4">
         <SectionHeading
           badge="Our Services"
