@@ -9,19 +9,74 @@ import SectionHeading from "./SectionHeading";
 
 const ContactSection = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      toast({ title: "Please fill all fields", variant: "destructive" });
+
+    if (loading) return;
+
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.message.trim()
+    ) {
+      toast({
+        title: "Please fill all fields",
+        variant: "destructive",
+      });
       return;
     }
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      let result: any = {};
+      try {
+        result = await response.json();
+      } catch {
+        result = { message: "Server error" };
+      }
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to send message");
+      }
+
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you within 24 hours.",
+      });
+
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error sending message",
+        description:
+          error?.message || "Backend not running or server error.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,42 +93,57 @@ const ContactSection = () => {
           <AnimatedSection>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1.5">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Name
+                </label>
                 <Input
-                  id="name"
                   placeholder="Your name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-card border-border"
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   maxLength={100}
                 />
               </div>
+
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Email
+                </label>
                 <Input
-                  id="email"
                   type="email"
                   placeholder="you@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-card border-border"
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   maxLength={255}
                 />
               </div>
+
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1.5">Message</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Message
+                </label>
                 <Textarea
-                  id="message"
                   placeholder="Tell us about your project..."
                   rows={5}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="bg-card border-border resize-none"
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
                   maxLength={1000}
                 />
               </div>
-              <Button type="submit" variant="hero" size="lg" className="w-full">
-                Send Message
+
+              <Button
+                type="submit"
+                variant="hero"
+                size="lg"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send Message"}
                 <Send size={18} />
               </Button>
             </form>
@@ -83,36 +153,43 @@ const ContactSection = () => {
           <AnimatedSection delay={0.15}>
             <div className="flex flex-col justify-center h-full space-y-8">
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Get in Touch</h3>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  Get in Touch
+                </h3>
                 <p className="text-muted-foreground">
-                  We respond within 24 hours. Choose the channel that works best for you.
+                  We respond within 24 hours. Choose the channel that works best
+                  for you.
                 </p>
               </div>
 
               <div className="space-y-5">
                 <a
                   href="mailto:hello@techstarter.com"
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card"
                 >
                   <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                    <Mail className="text-primary-foreground" size={20} />
+                    <Mail size={20} />
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Email</div>
-                    <div className="font-medium text-foreground group-hover:text-primary transition-colors">hello@techstarter.com</div>
+                    <div className="font-medium">
+                      hello@techstarter.com
+                    </div>
                   </div>
                 </a>
 
                 <a
                   href="tel:+919876543210"
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card"
                 >
                   <div className="w-12 h-12 rounded-xl gradient-accent flex items-center justify-center">
-                    <Phone className="text-accent-foreground" size={20} />
+                    <Phone size={20} />
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Phone</div>
-                    <div className="font-medium text-foreground group-hover:text-accent transition-colors">+91 98765 43210</div>
+                    <div className="font-medium">
+                      +91 98765 43210
+                    </div>
                   </div>
                 </a>
 
@@ -120,14 +197,18 @@ const ContactSection = () => {
                   href="https://wa.me/919876543210"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-card"
                 >
                   <div className="w-12 h-12 rounded-xl bg-[hsl(142_70%_45%)] flex items-center justify-center">
-                    <MessageCircle className="text-primary-foreground" size={20} />
+                    <MessageCircle size={20} />
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">WhatsApp</div>
-                    <div className="font-medium text-foreground group-hover:text-primary transition-colors">Chat with us</div>
+                    <div className="text-sm text-muted-foreground">
+                      WhatsApp
+                    </div>
+                    <div className="font-medium">
+                      Chat with us
+                    </div>
                   </div>
                 </a>
               </div>
