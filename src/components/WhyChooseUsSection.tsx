@@ -34,7 +34,7 @@ const WhyChooseUsSection = () => {
   return (
     <section className="py-32 relative bg-secondary/60 overflow-hidden">
       {/* decorative vertical line */}
-      <div className="absolute left-1/2 top-0 h-full w-px bg-border hidden lg:block" />
+      <div className="absolute left-1/2 top-[40%] h-[60%] w-px bg-border hidden lg:block" />
 
       <div className="container mx-auto px-4 relative z-10">
         <SectionHeading

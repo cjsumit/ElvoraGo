@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
+  { label: "Home", href: "/" },
   { label: "Services", href: "#services" },
   { label: "AI Solutions", href: "#ai" },
   { label: "Students", href: "#students" },
   { label: "Consulting", href: "#consulting" },
-  { label: "About", href: "#about" },
+  { label: "About", href: "/about" },
+  { label: "contact", href: "/contact" },
 ];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [theme, setTheme] = useState("light");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle Scroll Effect
   useEffect(() => {
@@ -25,35 +30,51 @@ const Navbar = () => {
 
   // FORCE LIGHT MODE BY DEFAULT
   useEffect(() => {
-    // Sirf tabhi Dark Mode on karein agar user ne PEHLE kabhi 'dark' set kiya tha.
-    // System settings (laptop dark mode) ko ignore kar diya gaya hai.
-    if (localStorage.theme === 'dark') {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
+    if (localStorage.theme === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
     } else {
-      // By Default: Light Mode
-      setTheme('light');
-      document.documentElement.classList.remove('dark');
-      localStorage.theme = 'light';
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
     }
   }, []);
 
   const toggleTheme = () => {
     if (theme === "light") {
       setTheme("dark");
-      localStorage.theme = 'dark';
+      localStorage.theme = "dark";
       document.documentElement.classList.add("dark");
     } else {
       setTheme("light");
-      localStorage.theme = 'light';
+      localStorage.theme = "light";
       document.documentElement.classList.remove("dark");
     }
   };
 
   const handleClick = (href: string) => {
     setIsMobileOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+
+    // SECTION LINKS (#...)
+    if (href.startsWith("#")) {
+      if (location.pathname === "/") {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        navigate("/");
+
+        // wait for home page to mount
+        setTimeout(() => {
+          const el = document.querySelector(href);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+      return;
+    }
+
+    // ROUTE LINKS (/about, /contact, /)
+    navigate(href);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -68,18 +89,23 @@ const Navbar = () => {
         
         {/* LOGO */}
         <a
-          href="#home"
+          href="/"
           onClick={(e) => {
             e.preventDefault();
-            handleClick("#home");
+            handleClick("/");
           }}
           className="flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xl transition-transform group-hover:scale-110">
-            V
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
+            <img
+              src={logo}
+              alt="ElvoraGo Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <span className="text-xl md:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Vision<span className="text-indigo-600">.</span>
+
+          <span className="text-xl md:text-2xl font-bold tracking-tight font-serif text-slate-900 dark:text-white">
+            <b>E</b>lvora<b>G</b>o<span className="text-indigo-600">.</span>
           </span>
         </a>
 
@@ -100,7 +126,6 @@ const Navbar = () => {
 
         {/* DESKTOP ACTIONS */}
         <div className="hidden lg:flex items-center gap-4">
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full transition-colors
@@ -111,13 +136,12 @@ const Navbar = () => {
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
 
-          {/* CTA Button */}
           <Button
             size="sm"
             className="font-semibold transition-all
                        bg-slate-900 text-white hover:bg-slate-800
                        dark:bg-white dark:text-slate-900 dark:hover:bg-indigo-50"
-            onClick={() => handleClick("#contact")}
+            onClick={() => handleClick("/contact")}
           >
             Free Consultation
           </Button>
@@ -131,7 +155,7 @@ const Navbar = () => {
           >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          
+
           <button
             className="p-2 rounded-md transition-colors text-slate-900 dark:text-white"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -160,13 +184,13 @@ const Navbar = () => {
             ))}
 
             <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <Button
+              <Button
                 className="w-full font-semibold
                            bg-indigo-600 text-white hover:bg-indigo-700"
-                onClick={() => handleClick("#contact")}
-                >
+                onClick={() => handleClick("/contact")}
+              >
                 Get Free Consultation
-                </Button>
+              </Button>
             </div>
           </div>
         </div>

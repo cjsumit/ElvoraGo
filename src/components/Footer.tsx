@@ -1,4 +1,5 @@
 import { Github, Linkedin, Twitter, Mail, ArrowUp } from "lucide-react";
+import logo from "../assets/logo1.png";
 
 const Footer = () => {
   const scrollTo = (id: string) => {
@@ -33,12 +34,22 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-2xl font-bold font-heading tracking-tight flex items-center gap-2 transition-colors duration-500
                            text-white dark:text-white">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg transition-colors duration-500 
-                              bg-zinc-800 
-                              dark:bg-indigo-600">
-                V
-              </div>
-              Vision<span className="text-zinc-500 dark:text-indigo-500">.</span>
+                        <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center 
+                      transition-colors duration-500 
+                      p-1"
+          >
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
+                            <span>
+                Elvora
+                <span className="text-zinc-500 dark:text-indigo-500">Go</span>
+              </span>
+
             </h3>
             <p className="text-sm leading-relaxed max-w-xs transition-colors duration-500
                           text-zinc-400 dark:text-slate-400">
@@ -59,13 +70,17 @@ const Footer = () => {
                 { label: "AI Solutions", href: "#ai" },
                 { label: "Students", href: "#students" },
                 { label: "Consulting", href: "#consulting" },
-                { label: "About", href: "#about" },
-                { label: "Contact", href: "#contact" },
+                { label: "About", href: "/about" },
+                { label: "Contact", href: "/contact" },
               ].map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
+                  onClick={(e) => {
+                          if (link.href.startsWith("#")) {
+                            e.preventDefault();  
+                            scrollTo(link.href);
+                          }}}
                   className="text-sm font-medium transition-all duration-200 hover:translate-x-1
                              text-zinc-400 hover:text-white 
                              dark:text-slate-400 dark:hover:text-indigo-400"
